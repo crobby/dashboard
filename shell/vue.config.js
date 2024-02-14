@@ -308,8 +308,9 @@ module.exports = function(dir, _appConfig) {
         cert: fs.readFileSync(path.resolve(__dirname, 'server/server.crt'))
       } : null),
       port:   (devPorts ? 8005 : 80),
-      host:   '0.0.0.0',
-      public: `https://0.0.0.0:${ devPorts ? 8005 : 80 }`,
+      host:   'localhost',
+      public: `https://rancherdashboard.chadrancher.us`,
+      disableHostCheck: true,
       before(app, server) {
         const socketProxies = {};
 

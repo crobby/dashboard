@@ -12,7 +12,8 @@ export const BASE_SCOPES = {
   github:       ['read:org'],
   googleoauth:  ['openid profile email'],
   azuread:      [],
-  keycloakoidc: ['openid profile email']
+  keycloakoidc: ['openid profile email'],
+  genericoidc:  ['openid profile email'],
 };
 
 const KEY = 'rc_nonce';
@@ -150,6 +151,7 @@ export const actions = {
 
   async getAuthProvider({ dispatch }, id) {
     const authProviders = await dispatch('getAuthProviders');
+    console.debug("authProviders is: " + authProviders);
 
     return findBy(authProviders, 'id', id);
   },
@@ -203,6 +205,7 @@ export const actions = {
   },
 
   async redirectTo({ state, commit, dispatch }, opt = {}) {
+    console.debug("in redirectTo opt is: " + opt);
     const provider = opt.provider;
     let redirectUrl = opt.redirectUrl;
 
@@ -213,6 +216,8 @@ export const actions = {
     }
     let returnToUrl = `${ window.location.origin }/verify-auth`;
 
+    console.debug("in redirectTo, redirectUrl is: " + redirectUrl);
+    //await sleep(5000);
     if (provider === 'azuread') {
       const params = { response_type: 'code', response_mode: 'query' };
 
@@ -246,6 +251,7 @@ export const actions = {
       [GITHUB_NONCE]: encodedNonce
     };
 
+    console.debug("before !url.includes(github_redirect");
     if (!url.includes(GITHUB_REDIRECT)) {
       params[GITHUB_REDIRECT] = returnToUrl;
     }
@@ -266,12 +272,14 @@ export const actions = {
     try {
       parsed = JSON.parse(expectJSON);
     } catch {
+      console.debug("in verify, err_nonce");
       return ERR_NONCE;
     }
 
     const expect = parsed.nonce;
 
     if ( !expect || expect !== nonce ) {
+      console.debug("in verify, err_nonce2");
       return ERR_NONCE;
     }
 
@@ -281,7 +289,7 @@ export const actions = {
     if (parsed.pkceCodeVerifier) {
       body.code_verifier = parsed.pkceCodeVerifier;
     }
-
+    console.debug("in verify, after pkce");
     return dispatch('login', {
       provider,
       body
@@ -322,6 +330,8 @@ export const actions = {
 
   async login({ dispatch }, { provider, body }) {
     const driver = await dispatch('getAuthProvider', provider);
+    console.debug("in login, driver is: " + driver);
+    console.debug("in login, provider is: " + provider);
 
     try {
       const res = await driver.doAction('login', {
@@ -332,6 +342,7 @@ export const actions = {
 
       return res;
     } catch (err) {
+      console.debug("login err is: " + err);
       if (err._status === 401) {
         return Promise.reject(LOGIN_ERRORS.CLIENT_UNAUTHORIZED);
       } else if (err.message) {
@@ -365,3 +376,8 @@ export const actions = {
     dispatch('onLogout', null, { root: true });
   }
 };
+
+function sleep(time) {
+  console.debug("In sleep");
+  return new Promise((resolve) => setTimeout(resolve, time));
+}

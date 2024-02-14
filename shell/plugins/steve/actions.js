@@ -213,16 +213,20 @@ export default {
     resource, actionName, body, opt,
   }) {
     opt = opt || {};
-
+    console.debug("In resourceAction, resource is: " + resource);
     if ( !opt.url ) {
       opt.url = resource.actionLinkFor(actionName);
       // opt.url = (resource.actions || resource.actionLinks)[actionName];
     }
+    console.debug("In resourceAction, opt.url is: " + opt.url);
+    console.debug("In resourceAction, body is: " + body);
 
     opt.method = 'post';
     opt.data = body;
 
     const res = await dispatch('request', { opt });
+
+    console.debug("in resourceAction, result is: " + res)
 
     if ( opt.load !== false && res.type === 'collection' ) {
       await dispatch('loadMulti', res.data);

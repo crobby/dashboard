@@ -148,6 +148,7 @@ export default {
         return this.t('login.error');
       }
 
+      console.debug("in error handler");
       return this.err?.length ? this.t('login.specificError', { msg: this.err }) : '';
     },
 

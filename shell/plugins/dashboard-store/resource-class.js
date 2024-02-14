@@ -1061,6 +1061,7 @@ export default class Resource {
   }
 
   doAction(actionName, body, opt = {}) {
+    console.debug("in doAction, actionName is: " + actionName);
     return this.$dispatch('resourceAction', {
       resource: this,
       actionName,

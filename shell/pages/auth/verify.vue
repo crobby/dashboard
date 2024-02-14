@@ -20,7 +20,7 @@ function reply(err, code) {
 function isSaml($route) {
   const { query } = $route;
   const configQuery = get(query, 'config');
-
+  console.debug("in isSaml");
   return samlProviders.includes(configQuery);
 }
 
@@ -38,6 +38,7 @@ export default {
       if (errorMsg) {
         out = store.getters['i18n/withFallback'](`login.serverError.${ errorMsg }`, null, errorMsg);
       }
+      console.debug("about to redirect");
 
       redirect(`/auth/login?err=${ escape(out) }`);
 
@@ -55,6 +56,8 @@ export default {
       }
       const out = store.getters['i18n/t'](`login.error`);
 
+      console.debug("after parse");
+
       console.error('Failed to parse nonce', stateStr, err); // eslint-disable-line no-console
 
       redirect(`/auth/login?err=${ escape(out) }`);
@@ -69,6 +72,7 @@ export default {
     }
 
     try {
+      console.debug("about to dispatch to auth/verifyOAuth");
       const res = await store.dispatch('auth/verifyOAuth', {
         code,
         nonce,
@@ -95,6 +99,7 @@ export default {
   },
 
   data() {
+    console.debug("In the verify data function")
     const stateJSON = this.$route.query[GITHUB_NONCE] || '';
 
     let parsed = {};
